@@ -3,14 +3,14 @@
 %define use_session_bus 0
 %define systemddir /lib/systemd
 
-Name: message-port
-Summary: Message port daemon
-Version: 1.0.3
-Release: 2
-Group: System/Service
-License: LGPL-2.1+
-Source0: %{name}-%{version}.tar.gz
-Source1: %{name}.manifest
+Name:       message-port
+Summary:    Message port daemon
+Version:    1.0.3
+Release:    0
+Group:      System/Service
+License:    LGPL-2.1+
+Source0:    %{name}-%{version}.tar.gz
+Source1:    %{name}.manifest
 
 BuildRequires: pkgconfig(aul)
 BuildRequires: pkgconfig(dlog)
@@ -45,11 +45,12 @@ Requires:   lib%{name} = %{version}-%{release}
 %description -n lib%{name}-devel
 Development files for message-port client library.
 
+
 %if %{build_tests} == 1
 
 %package -n %{name}-tests
 Summary: Unit tests for messageport
-Group: Development/Testing
+Group:   Development/Testing
 Requires: lib%{name} = %{version}-%{release}
 
 %description -n %{name}-tests
@@ -61,20 +62,19 @@ Unit tests for messageport implementation.
 %prep
 %setup -q -n %{name}-%{version}
 cp -a %{SOURCE1} .
-mkdir m4 > /dev/null
-autoreconf -f -i
+mkdir -p m4 > /dev/null
 
 
 %build
-%configure \
+%reconfigure \
 %if %{build_tests} == 1
-     --enable-tests\
+     --enable-tests \
 %endif
 %if %{use_session_bus} == 1
     --enable-sessionbus \
 %endif
 
-make %{?_smp_mflags}
+%__make %{?_smp_mflags}
 
 
 %install
@@ -82,6 +82,7 @@ make %{?_smp_mflags}
 
 mkdir -p ${RPM_BUILD_ROOT}%{systemddir}/system
 cp messageportd.service $RPM_BUILD_ROOT%{systemddir}/system
+
 
 %post
 /bin/systemctl enable messageportd.service
@@ -105,6 +106,7 @@ cp messageportd.service $RPM_BUILD_ROOT%{systemddir}/system
 %manifest %{name}.manifest
 %endif
 %{systemddir}/system/messageportd.service
+%license COPYING.LIB
 
 # libmessage-port
 %files -n lib%{name}
@@ -113,7 +115,6 @@ cp messageportd.service $RPM_BUILD_ROOT%{systemddir}/system
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING.LIB README
 %{_libdir}/lib%{name}.so*
-
 
 #libmessage-port-devel
 %files -n lib%{name}-devel
