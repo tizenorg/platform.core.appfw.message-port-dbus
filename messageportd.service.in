@@ -3,7 +3,7 @@ Description=Messageport Daemon
 
 [Service]
 Type=simple
-User=app
+User=messageport
 SmackExecLabel=User
 KillSignal=SIGTERM
 Restart=always
