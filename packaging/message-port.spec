@@ -2,6 +2,9 @@
 %define build_tests 1
 %define use_session_bus 0
 %define systemddir /lib/systemd
+%define daemon_user messageport
+%define daemon_group messageport
+
 
 Name:       message-port
 Summary:    Message port daemon
@@ -85,6 +88,9 @@ cp messageportd.service $RPM_BUILD_ROOT%{systemddir}/system
 
 
 %post
+getent group %{daemon_group} >/dev/null || %{_sbindir}/groupadd -r -o %{daemon_group}
+getent passwd %{daemon_user} >/dev/null || %{_sbindir}/useradd -r -g %{daemon_group} -s /bin/false -d /run/%{daemon_user} -c "Message Port daemon" %{daemon_user}
+
 /bin/systemctl enable messageportd.service
 
 %postun
