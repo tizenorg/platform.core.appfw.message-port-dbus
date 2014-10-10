@@ -1,10 +1,7 @@
-
 %define build_tests 1
 %define use_session_bus 0
-%define systemddir /lib/systemd
 %define daemon_user messageport
 %define daemon_group messageport
-
 
 Name:       message-port
 Summary:    Message port daemon
@@ -61,7 +58,6 @@ Unit tests for messageport implementation.
 
 %endif
 
-
 %prep
 %setup -q -n %{name}-%{version}
 cp -a %{SOURCE1} .
@@ -83,25 +79,24 @@ mkdir -p m4 > /dev/null
 %install
 %make_install
 
-mkdir -p ${RPM_BUILD_ROOT}%{systemddir}/system
-cp messageportd.service $RPM_BUILD_ROOT%{systemddir}/system
+mkdir -p %{buildroot}%{_unitdir}
+cp messageportd.service %{buildroot}%{_unitdir}
 
 
 %post
-getent group %{daemon_group} >/dev/null || %{_sbindir}/groupadd -r -o %{daemon_group}
-getent passwd %{daemon_user} >/dev/null || %{_sbindir}/useradd -r -g %{daemon_group} -s /bin/false -d /run/%{daemon_user} -c "Message Port daemon" %{daemon_user}
+getent group %{daemon_group} >/dev/null || groupadd -r -o %{daemon_group}
+getent passwd %{daemon_user} >/dev/null || useradd -r -g %{daemon_group} -s /bin/false -d /run/%{daemon_user} -c "Message Port daemon" %{daemon_user}
 
-/bin/systemctl enable messageportd.service
+systemctl enable messageportd.service
 
 %postun
-/bin/systemctl disable messageportd.service
+systemctl disable messageportd.service
 
 %post -n lib%{name}
-/sbin/ldconfig
+ldconfig
 
 %postun -n lib%{name}
-/sbin/ldconfig
-
+ldconfig
 
 # daemon: message-port
 %files -n %{name}
@@ -111,7 +106,7 @@ getent passwd %{daemon_user} >/dev/null || %{_sbindir}/useradd -r -g %{daemon_gr
 %{_datadir}/dbus-1/services/org.tizen.messageport.service
 %manifest %{name}.manifest
 %endif
-%{systemddir}/system/messageportd.service
+%{_unitdir}/messageportd.service
 %license COPYING.LIB
 
 # libmessage-port
@@ -119,7 +114,7 @@ getent passwd %{daemon_user} >/dev/null || %{_sbindir}/useradd -r -g %{daemon_gr
 %defattr(-,root,root,-)
 %manifest %{name}.manifest
 %defattr(-,root,root,-)
-%doc AUTHORS COPYING.LIB README
+%doc AUTHORS COPYING.LIB
 %{_libdir}/lib%{name}.so*
 
 #libmessage-port-devel
