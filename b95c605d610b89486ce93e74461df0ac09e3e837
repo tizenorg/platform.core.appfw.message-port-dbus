@@ -1,0 +1,7 @@
+Code-Review+2: Amarnath Valluri <amarnath.valluri@linux.intel.com>
+Verified+1: Amarnath Valluri <amarnath.valluri@linux.intel.com>
+Submitted-by: Semun Lee <sm79.lee@samsung.com>
+Submitted-at: Wed, 12 Nov 2014 15:22:07 -0800
+Reviewed-on: https://review.tizen.org/gerrit/28592
+Project: platform/core/appfw/message-port-dbus
+Branch: refs/heads/tizen
