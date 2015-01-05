@@ -51,6 +51,26 @@ _messageport_register_port (const char *name, gboolean is_trusted, messageport_m
     return port_id > 0 ? port_id : (int)res;
 }
 
+static int
+_messageport_unregister_port (int local_port_id, gboolean is_trusted)
+{
+    messageport_error_e res, res_check_trust;
+    gboolean is_trusted_out;
+    MsgPortManager *manager = msgport_factory_get_manager ();
+    if (!manager) return MESSAGEPORT_ERROR_IO_ERROR;
+
+    res_check_trust = msgport_manager_get_service_is_trusted (manager, local_port_id, &is_trusted_out);
+    if (res_check_trust != MESSAGEPORT_ERROR_NONE)
+        return (int)res_check_trust;
+
+    if (is_trusted_out == is_trusted)
+        return MESSAGEPORT_ERROR_MESSAGEPORT_NOT_FOUND;
+
+    res = msgport_manager_unregister_service (manager, local_port_id);
+
+    return (int)res;
+}
+
 static messageport_error_e
 _messageport_check_remote_port (const char *app_id, const char *port, gboolean is_trusted, bool *exists)
 {
@@ -72,6 +92,7 @@ _messageport_send_message (const char *app_id, const char *port, gboolean is_tru
     MsgPortManager *manager = msgport_factory_get_manager ();
 
     if (!manager) return MESSAGEPORT_ERROR_IO_ERROR;
+    if (!message) return MESSAGEPORT_ERROR_INVALID_PARAMETER;
 
     GVariant *v_data = bundle_to_variant_map (message);
 
@@ -84,6 +105,7 @@ _messageport_send_bidirectional_message (int id, const gchar *remote_app_id, con
     MsgPortManager *manager = msgport_factory_get_manager ();
 
     if (!manager) return MESSAGEPORT_ERROR_IO_ERROR;
+    if (!message) return MESSAGEPORT_ERROR_INVALID_PARAMETER;
 
     GVariant *v_data = bundle_to_variant_map (message);
 
@@ -116,6 +138,18 @@ int
 messageport_register_trusted_local_port_full (const char *local_port, messageport_message_cb_full callback, void *userdata)
 {
     return _messageport_register_port (local_port, TRUE, callback, userdata);
+}
+
+int
+messageport_unregister_local_port (int local_port_id)
+{
+    return _messageport_unregister_port (local_port_id, FALSE);
+}
+
+int
+messageport_unregister_trusted_local_port (int trusted_local_port_id)
+{
+    return _messageport_unregister_port (trusted_local_port_id, TRUE);
 }
 
 messageport_error_e
@@ -178,3 +212,4 @@ messageport_check_trusted_local_port (int id, bool *is_trusted_out)
 
     return res;
 }
+

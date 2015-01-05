@@ -43,6 +43,10 @@ PKG_CHECK_MODULES([DLOG], [dlog], [AC_DEFINE([HAVE_DLOG], [1], [Use DLOG])])
 AC_SUBST(DLOG_CFLAGS)
 AC_SUBST(DLOG_LIBS)
 
+PKG_CHECK_MODULES([CAPIBASECOMMON], [capi-base-common])
+AC_SUBST(CAPIBASECOMMON_CFLAGS)
+AC_SUBST(CAPIBASECOMMON_LIBS)
+
 AC_DEFINE(MESSAGEPORT_BUS_ADDRESS, 
          ["unix:path=%s/.message-port", "/tmp"],
          [messageport daemon server socket address])
