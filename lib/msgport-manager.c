@@ -27,7 +27,6 @@
 #include "msgport-manager.h"
 #include "msgport-service.h"
 #include "msgport-utils.h" /* msgport_daemon_error_to_error */
-#include "message-port.h" /* messageport_error_e */
 #include "common/dbus-manager-glue.h"
 #ifdef  USE_SESSION_BUS
 #include "common/dbus-server-glue.h"
@@ -264,7 +263,7 @@ _get_local_port (MsgPortManager *manager, int service_id)
 }
 
 messageport_error_e
-msgport_manager_unregister_servcie (MsgPortManager *manager, int service_id)
+msgport_manager_unregister_service (MsgPortManager *manager, int service_id)
 {
     const gchar *object_path = NULL;
     MsgPortService *service = NULL;
@@ -342,7 +341,7 @@ msgport_manager_get_service_is_trusted (MsgPortManager *manager, int service_id,
     MsgPortService *service = NULL;
     g_return_val_if_fail (manager && MSGPORT_IS_MANAGER (manager), MESSAGEPORT_ERROR_IO_ERROR);
     g_return_val_if_fail (manager->proxy, MESSAGEPORT_ERROR_IO_ERROR);
-    g_return_val_if_fail (service_id && is_trusted_out, MESSAGEPORT_ERROR_INVALID_PARAMETER);
+    g_return_val_if_fail (service_id > 0 && is_trusted_out, MESSAGEPORT_ERROR_INVALID_PARAMETER);
 
     service = _get_local_port (manager, service_id);
     if (!service) return MESSAGEPORT_ERROR_MESSAGEPORT_NOT_FOUND;
