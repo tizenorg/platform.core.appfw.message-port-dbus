@@ -28,7 +28,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include <message-port.h>
+#include <message_port.h>
 
 #define MSGPORT_TYPE_MANAGER (msgport_manager_get_type())
 #define MSGPORT_MANAGER(obj)          (G_TYPE_CHECK_INSTANCE_CAST((obj), MSGPORT_TYPE_MANAGER, MsgPortManager))
@@ -39,6 +39,10 @@
 typedef struct _MsgPortManager MsgPortManager;
 typedef struct _MsgPortManagerClass MsgPortManagerClass;
 typedef struct _MsgPortService MsgPortService;
+
+extern GHashTable *msgport_listeners;
+extern GHashTable *msgport_trusted_listeners;
+extern pthread_mutex_t msgport_mutex;
 
 G_BEGIN_DECLS
 

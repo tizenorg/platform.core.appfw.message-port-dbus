@@ -27,7 +27,6 @@
 #include "msgport-manager.h"
 #include "msgport-service.h"
 #include "msgport-utils.h" /* msgport_daemon_error_to_error */
-#include "message-port.h" /* messageport_error_e */
 #include "common/dbus-manager-glue.h"
 #ifdef  USE_SESSION_BUS
 #include "common/dbus-server-glue.h"

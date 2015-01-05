@@ -29,6 +29,9 @@
 #include <glib.h>
 
 GHashTable *__managers = NULL; /* GThread:MsgPortManager */
+GHashTable *msgport_listeners = NULL;
+GHashTable *msgport_trusted_listeners = NULL;
+pthread_mutex_t msgport_mutex = PTHREAD_MUTEX_INITIALIZER;
 G_LOCK_DEFINE(managers);
 
 static 
@@ -39,6 +42,14 @@ void msgport_factory_init ()
     if (!__managers)
         __managers = g_hash_table_new_full (g_direct_hash, g_direct_equal,
                               NULL, (GDestroyNotify)g_object_unref);
+
+    pthread_mutex_lock(&msgport_mutex);
+    if (!msgport_listeners)
+        msgport_listeners = g_hash_table_new(g_int_hash, g_int_equal);
+
+    if (!msgport_trusted_listeners)
+        msgport_trusted_listeners = g_hash_table_new(g_int_hash, g_int_equal);
+    pthread_mutex_unlock(&msgport_mutex);
 
     G_UNLOCK(managers);
 }
@@ -53,6 +64,18 @@ void msgport_factory_uninit ()
     }
 
     G_UNLOCK(managers);
+
+    pthread_mutex_lock(&msgport_mutex);
+    if (msgport_listeners) {
+        g_hash_table_destroy(msgport_listeners);
+        msgport_listeners = NULL;
+    }
+
+    if (msgport_trusted_listeners) {
+        g_hash_table_destroy(msgport_trusted_listeners);
+        msgport_trusted_listeners = NULL;
+    }
+    pthread_mutex_unlock(&msgport_mutex);
 }
 
 MsgPortManager * msgport_factory_get_manager () 
