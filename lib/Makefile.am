@@ -10,6 +10,8 @@ libmessage_port_la_SOURCES = \
     msgport-manager.c \
     msgport-factory.h \
     msgport-factory.c \
+    capi/message_port.cpp \
+    capi/message_port_internal.cpp \
     $(NULL)
 
 libmessage_port_la_LDFLAGS = -version-info $(subst .,:,$(VERSION))
@@ -17,11 +19,14 @@ libmessage_port_la_LDFLAGS = -version-info $(subst .,:,$(VERSION))
 libmessage_port_la_includedir = $(includedir)/
 libmessage_port_la_include_HEADERS = \
     message-port.h  \
+    capi/message_port.h  \
+    capi/message_port_internal.h  \
     $(NULL)
 
 libmessage_port_la_CPPFLAGS = \
     -I . \
     -I $(top_builddir) \
+    -I./capi \
     -DLOG_TAG=\"MESSAGEPORT/LIB\" \
     $(GLIB_CFLAGS) $(GIO_CFLAGS) $(BUNDLE_CFLAGS) $(DLOG_CFLAGS) \
     -Wall -error
