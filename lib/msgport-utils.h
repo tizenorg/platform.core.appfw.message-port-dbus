@@ -28,7 +28,7 @@
 
 #include <bundle.h>
 #include <glib.h>
-#include <message-port.h>
+#include <message_port.h>
 
 GVariant *bundle_to_variant_map (bundle *b);
 bundle   *bundle_from_variant_map (GVariant *v);

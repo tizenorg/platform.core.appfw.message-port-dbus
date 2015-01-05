@@ -28,7 +28,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include <message-port.h>
+#include <message_port.h>
 
 #define MSGPORT_TYPE_MANAGER (msgport_manager_get_type())
 #define MSGPORT_MANAGER(obj)          (G_TYPE_CHECK_INSTANCE_CAST((obj), MSGPORT_TYPE_MANAGER, MsgPortManager))

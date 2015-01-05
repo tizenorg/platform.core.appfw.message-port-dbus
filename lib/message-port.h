@@ -36,9 +36,11 @@
 
 #include <bundle.h>
 #include <glib.h>
+#include <stdbool.h>
+#include <tizen_error.h>
 
-#ifndef __cplusplus
-typedef guint8 bool;
+#ifndef __TIZEN_APPFW_MESSAGE_PORT_H__
+#warning "Include \"message_port.h\" instead of this."
 #endif
 
 G_BEGIN_DECLS
@@ -58,13 +60,14 @@ G_BEGIN_DECLS
  */
 typedef enum _messageport_error_e
 {
-    MESSAGEPORT_ERROR_NONE = 0, 
-    MESSAGEPORT_ERROR_IO_ERROR = -1,
-    MESSAGEPORT_ERROR_OUT_OF_MEMORY = -2,
-    MESSAGEPORT_ERROR_INVALID_PARAMETER = -3,
-    MESSAGEPORT_ERROR_MESSAGEPORT_NOT_FOUND = -4,
-    MESSAGEPORT_ERROR_CERTIFICATE_NOT_MATCH = -5,
-    MESSAGEPORT_ERROR_MAX_EXCEEDED = -6,
+    MESSAGEPORT_ERROR_NONE = TIZEN_ERROR_NONE,                                     /**< Successful */
+    MESSAGEPORT_ERROR_IO_ERROR = TIZEN_ERROR_IO_ERROR,                             /**< Internal I/O error */
+    MESSAGEPORT_ERROR_OUT_OF_MEMORY = TIZEN_ERROR_OUT_OF_MEMORY,                   /**< Out of memory */
+    MESSAGEPORT_ERROR_INVALID_PARAMETER = TIZEN_ERROR_INVALID_PARAMETER,           /**< Invalid parameter */
+    MESSAGEPORT_ERROR_MESSAGEPORT_NOT_FOUND = TIZEN_ERROR_MESSAGE_PORT | 0x01,            /**< The message port of the remote application is not found */
+    MESSAGEPORT_ERROR_CERTIFICATE_NOT_MATCH = TIZEN_ERROR_MESSAGE_PORT | 0x02,     /**< The remote application is not signed with the same certificate */
+    MESSAGEPORT_ERROR_MAX_EXCEEDED = TIZEN_ERROR_MESSAGE_PORT | 0x03,              /**< The size of the message has exceeded the maximum limit */
+    MESSAGEPORT_ERROR_RESOURCE_UNAVAILABLE = TIZEN_ERROR_MESSAGE_PORT | 0x04       /**< Resource is temporarily unavailable */
 } messageport_error_e;
 
 /**
@@ -167,6 +170,40 @@ messageport_register_trusted_local_port(const char* local_port, messageport_mess
  */
 EXPORT_API int
 messageport_register_trusted_local_port_full(const char* local_port, messageport_message_cb_full callback, void *userdata);
+
+/**
+ * messageport_unregister_local_port:
+ * @local_port_id: The local message port ID
+ *
+ * Unregisters the local message port.
+ * This method unregisters the callback function with the specified local port ID.
+ *
+ * Returns: 0 on success, otherwise a negative error value.
+ *          #MESSAGEPORT_ERROR_NONE Successful
+ *          #MESSAGEPORT_ERROR_INVALID_PARAMETER The specified @a local_port_id is not positive
+ *          #MESSAGEPORT_ERROR_MESSAGEPORT_NOT_FOUND The specified @a local_port_id cannot be found
+ *          #MESSAGEPORT_ERROR_OUT_OF_MEMORY Out of memory
+ *          #MESSAGEPORT_ERROR_IO_ERROR Internal I/O error
+ */
+EXPORT_API int
+messageport_unregister_local_port(int local_port_id);
+
+/**
+ * messageport_unregister_trusted_local_port:
+ * @trusted_local_port_id: The trusted local message port ID
+ *
+ * Unregisters the trusted local message port.
+ * This method unregisters the callback function with the specified trusted local port ID.
+ *
+ * Returns: 0 on success, otherwise a negative error value.
+ *          #MESSAGEPORT_ERROR_NONE Successful
+ *          #MESSAGEPORT_ERROR_INVALID_PARAMETER The specified @a local_port_id is not positive
+ *          #MESSAGEPORT_ERROR_MESSAGEPORT_NOT_FOUND The specified @a local_port_id cannot be found
+ *          #MESSAGEPORT_ERROR_OUT_OF_MEMORY Out of memory
+ *          #MESSAGEPORT_ERROR_IO_ERROR Internal I/O error
+ */
+EXPORT_API int
+messageport_unregister_trusted_local_port(int trusted_local_port_id);
 
 /**
  * messageport_check_remote_port:

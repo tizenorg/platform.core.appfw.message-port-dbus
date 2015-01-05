@@ -29,7 +29,7 @@
 #include <glib.h>
 #include <gio/gio.h>
 #include <glib-object.h>
-#include <message-port.h>
+#include <message_port.h>
 
 G_BEGIN_DECLS
 
