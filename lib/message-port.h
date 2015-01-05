@@ -36,10 +36,8 @@
 
 #include <bundle.h>
 #include <glib.h>
-
-#ifndef __cplusplus
-typedef guint8 bool;
-#endif
+#include <stdbool.h>
+#include <tizen_error.h>
 
 G_BEGIN_DECLS
 
@@ -58,13 +56,14 @@ G_BEGIN_DECLS
  */
 typedef enum _messageport_error_e
 {
-    MESSAGEPORT_ERROR_NONE = 0, 
-    MESSAGEPORT_ERROR_IO_ERROR = -1,
-    MESSAGEPORT_ERROR_OUT_OF_MEMORY = -2,
-    MESSAGEPORT_ERROR_INVALID_PARAMETER = -3,
-    MESSAGEPORT_ERROR_MESSAGEPORT_NOT_FOUND = -4,
-    MESSAGEPORT_ERROR_CERTIFICATE_NOT_MATCH = -5,
-    MESSAGEPORT_ERROR_MAX_EXCEEDED = -6,
+    MESSAGEPORT_ERROR_NONE = TIZEN_ERROR_NONE,                                     /**< Successful */
+    MESSAGEPORT_ERROR_IO_ERROR = TIZEN_ERROR_IO_ERROR,                             /**< Internal I/O error */
+    MESSAGEPORT_ERROR_OUT_OF_MEMORY = TIZEN_ERROR_OUT_OF_MEMORY,                   /**< Out of memory */
+    MESSAGEPORT_ERROR_INVALID_PARAMETER = TIZEN_ERROR_INVALID_PARAMETER,           /**< Invalid parameter */
+    MESSAGEPORT_ERROR_MESSAGEPORT_NOT_FOUND = TIZEN_ERROR_MESSAGE_PORT | 0x01,            /**< The message port of the remote application is not found */
+    MESSAGEPORT_ERROR_CERTIFICATE_NOT_MATCH = TIZEN_ERROR_MESSAGE_PORT | 0x02,     /**< The remote application is not signed with the same certificate */
+    MESSAGEPORT_ERROR_MAX_EXCEEDED = TIZEN_ERROR_MESSAGE_PORT | 0x03,              /**< The size of the message has exceeded the maximum limit */
+    MESSAGEPORT_ERROR_RESOURCE_UNAVAILABLE = TIZEN_ERROR_MESSAGE_PORT | 0x04       /**< Resource is temporarily unavailable */
 } messageport_error_e;
 
 /**
@@ -97,6 +96,8 @@ typedef void (*messageport_message_cb)(int id, const char* remote_app_id, const 
  *          #MESSAGEPORT_ERROR_IO_ERROR Internal I/O error
  */
 EXPORT_API int
+messageport_register_local_port_with_user_data(const char* local_port, messageport_message_cb callback, void *user_data);
+EXPORT_API int
 messageport_register_local_port(const char* local_port, messageport_message_cb callback);
 
 /**
@@ -114,6 +115,8 @@ messageport_register_local_port(const char* local_port, messageport_message_cb c
  *          #MESSAGEPORT_ERROR_IO_ERROR Internal I/O error
  */
 EXPORT_API int
+messageport_register_trusted_local_port_with_user_data(const char* local_port, messageport_message_cb callback, void *user_data);
+EXPORT_API int
 messageport_register_trusted_local_port(const char* local_port, messageport_message_cb callback);
 
 /**
@@ -130,8 +133,7 @@ messageport_register_trusted_local_port(const char* local_port, messageport_mess
  *          #MESSAGEPORT_ERROR_OUT_OF_MEMORY Memory error occured
  *          #MESSAGEPORT_ERROR_IO_ERROR Internal I/O error
  */
-EXPORT_API messageport_error_e
-messageport_check_remote_port(const char* remote_app_id, const char *remote_port, bool *exist);
+EXPORT_API messageport_error_e messageport_check_remote_port(const char* remote_app_id, const char *remote_port, bool *exist);
 
 /**
  * messageport_check_trusted_remote_port:
