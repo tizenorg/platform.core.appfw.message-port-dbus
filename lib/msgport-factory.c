@@ -40,6 +40,12 @@ void msgport_factory_init ()
         __managers = g_hash_table_new_full (g_direct_hash, g_direct_equal,
                               NULL, (GDestroyNotify)g_object_unref);
 
+    if (!msgport_listeners)
+        msgport_listeners = g_hash_table_new(g_int_hash, g_int_equal);
+
+    if (!msgport_trusted_listeners)
+        msgport_trusted_listeners = g_hash_table_new(g_int_hash, g_int_equal);
+
     G_UNLOCK(managers);
 }
 

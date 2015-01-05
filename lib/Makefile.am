@@ -17,6 +17,8 @@ libmessage_port_la_LDFLAGS = -version-info $(subst .,:,$(VERSION))
 libmessage_port_la_includedir = $(includedir)/
 libmessage_port_la_include_HEADERS = \
     message-port.h  \
+    message_port.h  \
+    message_port_log.h  \
     $(NULL)
 
 libmessage_port_la_CPPFLAGS = \

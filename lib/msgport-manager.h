@@ -40,6 +40,9 @@ typedef struct _MsgPortManager MsgPortManager;
 typedef struct _MsgPortManagerClass MsgPortManagerClass;
 typedef struct _MsgPortService MsgPortService;
 
+GHashTable *msgport_listeners;
+GHashTable *msgport_trusted_listeners;
+
 G_BEGIN_DECLS
 
 struct _MsgPortManagerClass
