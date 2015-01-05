@@ -19,6 +19,7 @@ BuildRequires: pkgconfig(gio-unix-2.0)
 BuildRequires: pkgconfig(glib-2.0) >= 2.30
 BuildRequires: pkgconfig(gobject-2.0)
 BuildRequires: pkgconfig(pkgmgr-info)
+BuildRequires: pkgconfig(capi-base-common)
 
 %description
 This daemon allows the webapplications to communicates using 
@@ -122,6 +123,7 @@ ldconfig
 %defattr(-,root,root,-)
 %manifest %{name}.manifest
 %{_libdir}/pkgconfig/%{name}.pc
+%{_libdir}/lib%{name}.so*
 %{_includedir}/*.h
 
 %if %{build_tests} == 1
