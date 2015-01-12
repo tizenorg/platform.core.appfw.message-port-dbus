@@ -29,8 +29,16 @@
 #include "msgport-utils.h"
 #include "common/log.h"
 
+void
+_messageport_cb_helper (int id, const char* remote_app_id, const char* remote_port, bool trusted_message, bundle* message, void *userdata)
+{
+    messageport_message_cb client_cb = (messageport_message_cb)userdata;
+
+    if (client_cb) client_cb(id, remote_app_id, remote_port, trusted_message, message);
+}
+
 static int
-_messageport_register_port (const char *name, gboolean is_trusted, messageport_message_cb cb)
+_messageport_register_port (const char *name, gboolean is_trusted, messageport_message_cb_full cb, void *userdata)
 {
     int port_id = 0; /* id of the port created */
     messageport_error_e res;
@@ -38,7 +46,7 @@ _messageport_register_port (const char *name, gboolean is_trusted, messageport_m
 
     if (!manager) return MESSAGEPORT_ERROR_IO_ERROR;
 
-    res = msgport_manager_register_service (manager, name, is_trusted, cb, &port_id);
+    res = msgport_manager_register_service (manager, name, is_trusted, cb, userdata, &port_id);
 
     return port_id > 0 ? port_id : (int)res;
 }
@@ -87,15 +95,27 @@ _messageport_send_bidirectional_message (int id, const gchar *remote_app_id, con
  */
 
 int
-messageport_register_local_port(const char* local_port, messageport_message_cb callback)
+messageport_register_local_port (const char* local_port, messageport_message_cb callback)
 {
-    return _messageport_register_port (local_port, FALSE, callback);
+    return _messageport_register_port (local_port, FALSE, _messageport_cb_helper, (void*)callback);
 }
 
-messageport_error_e
+int
+messageport_register_local_port_full (const char *local_port, messageport_message_cb_full callback, void *userdata)
+{
+    return _messageport_register_port (local_port, FALSE, callback, userdata);
+}
+
+int
 messageport_register_trusted_local_port (const char *local_port, messageport_message_cb callback)
 {
-    return _messageport_register_port (local_port, TRUE, callback);
+    return _messageport_register_port (local_port, TRUE, _messageport_cb_helper, (void*)callback);
+}
+
+int
+messageport_register_trusted_local_port_full (const char *local_port, messageport_message_cb_full callback, void *userdata)
+{
+    return _messageport_register_port (local_port, TRUE, callback, userdata);
 }
 
 messageport_error_e
@@ -117,13 +137,13 @@ messageport_send_message (const char* remote_app_id, const char* remote_port, bu
 }
 
 messageport_error_e
-messageport_send_trusted_message(const char* remote_app_id, const char* remote_port, bundle* message)
+messageport_send_trusted_message (const char* remote_app_id, const char* remote_port, bundle* message)
 {
     return _messageport_send_message (remote_app_id, remote_port, TRUE, message);
 }
 
 messageport_error_e
-messageport_send_bidirectional_message(int id, const char* remote_app_id, const char* remote_port, bundle* data)
+messageport_send_bidirectional_message (int id, const char* remote_app_id, const char* remote_port, bundle* data)
 {
     return _messageport_send_bidirectional_message (id, remote_app_id, remote_port, FALSE, data);
 }
@@ -135,7 +155,7 @@ messageport_send_bidirectional_trusted_message (int id, const char *remote_app_i
 }
 
 messageport_error_e
-messageport_get_local_port_name(int id, char **name_out)
+messageport_get_local_port_name (int id, char **name_out)
 {
     MsgPortManager *manager = msgport_factory_get_manager ();
 

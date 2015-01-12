@@ -83,6 +83,22 @@ typedef enum _messageport_error_e
 typedef void (*messageport_message_cb)(int id, const char* remote_app_id, const char* remote_port, bool trusted_message, bundle* message);
 
 /**
+ * messageport_message_cb_full:
+ * @id: The ID of the local message port to which the message was sent.
+ * @remote_app_id: The ID of the remote application which has sent this message, or NULL
+ * @remote_port: The name of the remote message port, or NULL
+ * @trusted_message: TRUE if the remote message port is trusted port, i.e, it receives message from trusted applications.
+ * @message: The message received.
+ * @userdata: client specific userdata that was passed while registering service.
+ *
+ * This is the function type of the callback used for #messageport_register_local_port_full or #messageport_register_trusted_local_port_full.
+ * This is called when a message is received from the remote application, #remote_app_id and #remtoe_port will be set
+ * if the remote application sends a bidirectional message, otherwise they are NULL.
+ *
+ */
+typedef void (*messageport_message_cb_full)(int id, const char* remote_app_id, const char* remote_port, bool trusted_message, bundle* message, void *userdata);
+
+/**
  * messageport_register_local_port:
  * @local_port: local_port the name of the local message port
  * @callback: callback The callback function to be called when a message is received at this port
@@ -100,6 +116,24 @@ EXPORT_API int
 messageport_register_local_port(const char* local_port, messageport_message_cb callback);
 
 /**
+ * messageport_register_local_port_full:
+ * @local_port: local_port the name of the local message port
+ * @callback: callback The callback function to be called when a message is received at this port
+ * @userdata: client specific data.
+ * 
+ * Registers the local message port with name #local_port. If the message port name is already registered,
+ * the previous message port id returned, and the callback function is updated with #callback.
+ * The #callback function is called when a message is received from a remote application.
+ * 
+ * Returns: A message port id on success, otherwise a negative error value.
+ *          #MESSAGEPORT_ERROR_INVALID_PARAMETER If either #local_port or #callback is missing or invalid.
+ *          #MESSAGEPORT_ERROR_OUT_OF_MEMORY Memory error occured
+ *          #MESSAGEPORT_ERROR_IO_ERROR Internal I/O error
+ */
+EXPORT_API int
+messageport_register_local_port_full(const char* local_port, messageport_message_cb_full callback, void *userdata);
+
+/**
  * messageport_register_trusted_local_port:
  * @local_port:  local_port the name of the local message port
  * @callback: callback The callback function to be called when a message is received
@@ -115,6 +149,24 @@ messageport_register_local_port(const char* local_port, messageport_message_cb c
  */
 EXPORT_API int
 messageport_register_trusted_local_port(const char* local_port, messageport_message_cb callback);
+
+/**
+ * messageport_register_trusted_local_port_with_userdata:
+ * @local_port:  local_port the name of the local message port
+ * @callback: callback The callback function to be called when a message is received
+ * @userdata: client specific data.
+ *
+ * Registers the trusted local message port with name #local_port. If the message port name is already registered,
+ * the previous message port id returned, and the callback function is updated with #callback. 
+ * This allows communications only if the applications are signed with the same certificate which is uniquely assigned to the developer.
+ *
+ * Returns: A message port id on success, otherwise a negative error value.
+ *          #MESSAGEPORT_ERROR_INVALID_PARAMETER If either #local_port or #callback is missing or invalid.
+ *          #MESSAGEPORT_ERROR_OUT_OF_MEMORY Memory error occured
+ *          #MESSAGEPORT_ERROR_IO_ERROR Internal I/O error
+ */
+EXPORT_API int
+messageport_register_trusted_local_port_full(const char* local_port, messageport_message_cb_full callback, void *userdata);
 
 /**
  * messageport_check_remote_port:

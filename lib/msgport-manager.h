@@ -53,7 +53,7 @@ MsgPortManager *
 msgport_manager_new ();
 
 messageport_error_e
-msgport_manager_register_service (MsgPortManager *manager, const gchar *port_name, gboolean is_trusted, messageport_message_cb cb, int *service_id_out);
+msgport_manager_register_service (MsgPortManager *manager, const gchar *port_name, gboolean is_trusted, messageport_message_cb_full cb, void *userdata, int *service_id_out);
 
 messageport_error_e
 msgport_manager_check_remote_service (MsgPortManager *manager, const gchar *remote_app_id, const gchar *port_name, gboolean is_trusted, guint *service_id_out);

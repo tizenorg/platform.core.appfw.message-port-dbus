@@ -34,9 +34,10 @@ struct _MsgPortService
 {
     GObject parent;
 
-    MsgPortDbusGlueService *proxy;
-    guint                   on_messge_signal_id;
-    messageport_message_cb  client_cb;
+    MsgPortDbusGlueService      *proxy;
+    guint                        on_message_signal_id;
+    messageport_message_cb_full  client_cb;
+    void                        *client_data;
 };
 
 G_DEFINE_TYPE(MsgPortService, msgport_service, G_TYPE_OBJECT)
@@ -64,7 +65,7 @@ msgport_service_init (MsgPortService *service)
 {
     service->proxy = NULL;
     service->client_cb = NULL;
-    service->on_messge_signal_id = 0;
+    service->on_message_signal_id = 0;
 }
 
 static void
@@ -86,11 +87,11 @@ _on_got_message (MsgPortService *service, GVariant *data, const gchar *remote_ap
     if (remote_app_id && !remote_app_id[0]) remote_app_id = NULL;
     if (remote_port   && !remote_port[0])   remote_port = NULL;
 
-    service->client_cb (msgport_dbus_glue_service_get_id (service->proxy), remote_app_id, remote_port, remote_is_trusted, b);
+    service->client_cb (msgport_dbus_glue_service_get_id (service->proxy), remote_app_id, remote_port, remote_is_trusted, b, service->client_data);
 }
 
 MsgPortService *
-msgport_service_new (GDBusConnection *connection, const gchar *path, messageport_message_cb message_cb)
+msgport_service_new (GDBusConnection *connection, const gchar *path, messageport_message_cb_full message_cb, void *userdata)
 {
     GError *error = NULL;
 
@@ -109,7 +110,8 @@ msgport_service_new (GDBusConnection *connection, const gchar *path, messageport
     }
 
     service->client_cb = message_cb;
-    service->on_messge_signal_id = g_signal_connect_swapped (service->proxy, "on-message", G_CALLBACK (_on_got_message), service);
+    service->client_data = userdata;
+    service->on_message_signal_id = g_signal_connect_swapped (service->proxy, "on-message", G_CALLBACK (_on_got_message), service);
 
     return service;
 }
@@ -142,11 +144,12 @@ msgport_service_is_trusted (MsgPortService *service)
 }
 
 void
-msgport_service_set_message_handler (MsgPortService *service, messageport_message_cb handler)
+msgport_service_set_message_handler (MsgPortService *service, messageport_message_cb_full handler, void *userdata)
 {
     g_return_if_fail (service && MSGPORT_IS_SERVICE (service));
 
     service->client_cb = handler;
+    service->client_data = userdata;
 }
 
 gboolean

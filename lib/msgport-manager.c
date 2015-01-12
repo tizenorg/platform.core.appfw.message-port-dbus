@@ -167,12 +167,12 @@ MsgPortManager * msgport_manager_new ()
 }
 
 static messageport_error_e
-_create_and_cache_service (MsgPortManager *manager, gchar *object_path, messageport_message_cb cb, int *service_id)
+_create_and_cache_service (MsgPortManager *manager, gchar *object_path, messageport_message_cb_full cb, int *service_id, void *userdata)
 {
     int id;
     MsgPortService *service = msgport_service_new (
             g_dbus_proxy_get_connection (G_DBUS_PROXY(manager->proxy)),
-            object_path, cb);
+            object_path, cb, userdata);
     if (!service) {
         g_free (object_path);
         return MESSAGEPORT_ERROR_OUT_OF_MEMORY;
@@ -205,7 +205,7 @@ _find_service (gpointer key, gpointer value, gpointer data)
     
 
 messageport_error_e
-msgport_manager_register_service (MsgPortManager *manager, const gchar *port_name, gboolean is_trusted, messageport_message_cb message_cb, int *service_id)
+msgport_manager_register_service (MsgPortManager *manager, const gchar *port_name, gboolean is_trusted, messageport_message_cb_full message_cb, void *userdata, int *service_id)
 {
     GError *error = NULL;
     gchar *object_path = NULL;
@@ -226,7 +226,7 @@ msgport_manager_register_service (MsgPortManager *manager, const gchar *port_nam
         DBG ("Cached local port found for name '%s:%d' with ID : %d", port_name, is_trusted, id);
 
         /* update message handler */
-        msgport_service_set_message_handler (service, message_cb);
+        msgport_service_set_message_handler (service, message_cb, userdata);
         *service_id = id;
 
         return MESSAGEPORT_ERROR_NONE;
@@ -242,7 +242,7 @@ msgport_manager_register_service (MsgPortManager *manager, const gchar *port_nam
         return err; 
     }
 
-    return _create_and_cache_service (manager, object_path, message_cb, service_id);
+    return _create_and_cache_service (manager, object_path, message_cb, service_id, userdata);
 }
 
 static MsgPortService *

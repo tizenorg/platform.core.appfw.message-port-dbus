@@ -50,7 +50,7 @@ struct _MsgPortServiceClass
 GType msgport_service_get_type(void);
 
 MsgPortService *
-msgport_service_new (GDBusConnection *connection, const gchar *path, messageport_message_cb message_cb);
+msgport_service_new (GDBusConnection *connection, const gchar *path, messageport_message_cb_full message_cb, void *userdata);
 
 const gchar *
 msgport_service_name (MsgPortService *service);
@@ -62,7 +62,7 @@ guint
 msgport_service_id (MsgPortService *service);
 
 void
-msgport_service_set_message_handler (MsgPortService *service, messageport_message_cb handler);
+msgport_service_set_message_handler (MsgPortService *service, messageport_message_cb_full handler, void *userdata);
 
 gboolean
 msgport_service_unregister (MsgPortService *service);
