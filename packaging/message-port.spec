@@ -22,7 +22,7 @@ BuildRequires: pkgconfig(pkgmgr-info)
 BuildRequires: pkgconfig(capi-base-common)
 
 %description
-This daemon allows the webapplications to communicates using 
+This daemon allows the webapplications to communicates using
 Tizen MessagePort WebAPI.
 
 
@@ -31,7 +31,7 @@ Summary:    Client library for message port
 Group:      Base/Libraries
 Requires(post):   /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Requires: %{name} = %{version}-%{release} 
+Requires: %{name} = %{version}-%{release}
 BuildRequires: pkgconfig(bundle)
 
 %description -n lib%{name}
@@ -39,7 +39,7 @@ Client library that porvies C APIs to work with message port.
 
 
 %package -n lib%{name}-devel
-Summary:    Development files for libmessage-port 
+Summary:    Development files for libmessage-port
 Group:      Development/Libraries
 Requires:   lib%{name} = %{version}-%{release}
 
@@ -83,6 +83,10 @@ mkdir -p m4 > /dev/null
 mkdir -p %{buildroot}%{_unitdir}
 cp messageportd.service %{buildroot}%{_unitdir}
 
+#DBus DAC (message-port-dbus.manifest enables DBus SMACK)
+mkdir -p %{buildroot}%{_sysconfdir}/dbus-1/system.d
+cp packaging/message-port.conf %{buildroot}%{_sysconfdir}/dbus-1/system.d/message-port.conf
+
 
 %post
 getent group %{daemon_group} >/dev/null || groupadd -r -o %{daemon_group}
@@ -109,6 +113,7 @@ ldconfig
 %endif
 %{_unitdir}/messageportd.service
 %license COPYING.LIB
+%config %attr(644,root,root) %{_sysconfdir}/dbus-1/system.d/*
 
 # libmessage-port
 %files -n lib%{name}
